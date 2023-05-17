@@ -22,3 +22,7 @@ void Market::readFileHeader() {
 
   cin >> num_stocks;
 }
+
+void Market::getMode(int argc, char** argv) {
+
+}

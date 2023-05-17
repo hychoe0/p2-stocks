@@ -20,13 +20,24 @@ public:
 
   void readFileHeader();
 
+  // Setting argument for valid mode
+  void getMode(int argc, char** argv);
 
-  // MOVE THESE TO PRIVATE AFTER TEST
+  // MOVE TO PRIVATE AFTER TEST
   int num_traders;
 
   int num_stocks;
 
   std::string mode;
+
+  bool verbose;
+
+  bool median;
+
+  bool trader_info;
+
+  bool time_travelers;
+
 private:
 
 
