@@ -30,13 +30,13 @@ public:
 
   std::string mode;
 
-  bool verbose;
+  bool verbose = false;
 
-  bool median;
+  bool median = false;
 
-  bool trader_info;
+  bool trader_info = false;
 
-  bool time_travelers;
+  bool time_travelers = false;
 
 private:
 
