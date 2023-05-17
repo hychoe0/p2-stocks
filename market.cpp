@@ -68,3 +68,50 @@ void Market::getMode(int argc, char** argv) {
   }  // while
 }
 
+void Market::getOrders() {
+  Orders order;
+  
+  string junk;
+  char chunk;
+  int count;
+
+  if (mode == "TL") {
+    while (cin >> order.timestamp
+               >> order.intent >> junk // BUY or SELL
+               >> chunk >> order.trader_id // T_
+               >> chunk >> order.stock_id // S_
+               >> chunk >> order.price // $_
+               >> chunk >> order.quantity // #_
+               ) {
+                // Error handling
+                if (order.timestamp < 0) {
+                  cerr << "Error: Negative timestamp" << endl;
+                  exit(1);
+                }
+
+                if (order.trader_id < 0 || order.trader_id >= num_traders) {
+                  cerr << "Error: Invalid trader ID" << endl;
+                  exit(1);
+                }
+
+                if (order.stock_id < 0 || order.stock_id >= num_stocks) {
+                  cerr << "Error: Invalid stock ID" << endl;
+                  exit(1);
+                }
+
+                if (order.price < 0) {
+                  cerr << "Error: Invalid price" << endl;
+                  exit(1);
+                }
+
+                if (order.quantity < 0) {
+                  cerr << "Error: Invalid quantity" << endl;
+                  exit(1);
+                }
+
+                ++placement;
+
+                return;
+               } // while ... cin each order
+  } // if ... TL mode
+} // getOrders()

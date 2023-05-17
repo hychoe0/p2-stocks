@@ -1,6 +1,7 @@
 {
   "editor.defaultFormatter": null,
   "files.associations": {
-    "iostream": "cpp"
+    "iostream": "cpp",
+    "queue": "cpp"
   }
 }
