@@ -112,6 +112,17 @@ void Market::getOrders() {
                 order.placement = count;
                 ++count;
 
+                if (order.intent == 'B') {
+                  buyingOrders.push(order);
+                }
+                else if (order.intent == 'S') {
+                  sellingOrders.push(order);
+                }
+                else {
+                  cerr << "Error: Invalid order intent" << endl;
+                  exit(1);
+                }
+
                } // while ... cin each order
   } // if ... TL mode
 } // getOrders()

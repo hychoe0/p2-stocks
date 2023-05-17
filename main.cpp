@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "market.h"
+#include <vector>
 
 using namespace std;
 
@@ -10,8 +11,20 @@ int main(int argc, char** argv) {
 
   market.readFileHeader();
   market.getMode(argc, argv);
+  market.getOrders();
 
   cout << "Processing orders...\n";
+
+  if (market.buyingOrders.empty()) {
+    cout << "No Orders in buying order" << endl;
+  }
+  else {
+    Orders topOrder = market.buyingOrders.top();
+    cout << "Top Order: " << topOrder.timestamp << " "
+         << topOrder.intent << " " << topOrder.trader_id << " "
+         << topOrder.stock_id << " " << topOrder.price << " "
+         << topOrder.quantity << " " << topOrder.placement << endl;
+  }
 
   // cout << market.mode << endl;
   // cout << market.num_traders << endl;

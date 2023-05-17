@@ -21,6 +21,12 @@ struct Orders {
   int quantity;
 
   int placement; // determine each order's placement time
+
+  Orders()
+        : timestamp(0), intent('\0'), trader_id(0), stock_id(0), price(0), quantity(0) {}
+
+  Orders(int ts, char i, int tId, int sId, int p, int q)
+        : timestamp(ts), intent(i), trader_id(tId), stock_id(sId), price(p), quantity(q) {}
 };
 
 // Comparator for buying orders (higher price has higher priority)
