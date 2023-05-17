@@ -70,10 +70,10 @@ void Market::getMode(int argc, char** argv) {
 
 void Market::getOrders() {
   Orders order;
-  
+
   string junk;
   char chunk;
-  int count;
+  int count = 0;
 
   if (mode == "TL") {
     while (cin >> order.timestamp
@@ -109,9 +109,9 @@ void Market::getOrders() {
                   exit(1);
                 }
 
-                ++placement;
+                order.placement = count;
+                ++count;
 
-                return;
                } // while ... cin each order
   } // if ... TL mode
 } // getOrders()
