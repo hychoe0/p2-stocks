@@ -25,13 +25,13 @@ void Market::readFileHeader() {
   // Resize stockList to num_stocks
   stockList.resize(static_cast<size_t>(num_stocks));
 
-  // //TEST
-  // for (size_t i = 0; i < stockList.size(); ++i) {
-  //   if (stockList[i].buyingOrders.empty() &&
-  //       stockList[i].sellingOrders.empty()) {
-  //     cout << "empty" << endl;
-  //   }
-  // }
+  //TEST
+  for (size_t i = 0; i < stockList.size(); ++i) {
+    if (stockList[i].buyingOrders.empty() &&
+        stockList[i].sellingOrders.empty()) {
+      cout << "empty" << endl;
+    }
+  }
 }
 
 void Market::getMode(int argc, char** argv) {
@@ -192,12 +192,10 @@ void Market::processOrders(istream &inputStream) {
     // curr_timestamp = order.timestamp;
 
     if (order.intent == 'B') {
-      stockList[static_cast<size_t>(order.stock_id)]
-      .buyingOrders.push(order);
+      stockList[static_cast<size_t>(order.stock_id)].buyingOrders.push(order);
     }
     else if (order.intent == 'S') {
-      stockList[static_cast<size_t>(order.stock_id)]
-      .sellingOrders.push(order);
+      stockList[static_cast<size_t>(order.stock_id)].sellingOrders.push(order);
     }
     else {
       cerr << "Error: Invalid order intent" << endl;
