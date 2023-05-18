@@ -49,9 +49,14 @@ struct SellComparator {
     }
 };
 
-class Stock {
+class Stocks {
+public:
+
   // need two priority queue for buying and selling stock
-  // priority_queue
+  priority_queue<Orders, vector<Orders>, BuyComparator> buyingOrders;
+  priority_queue<Orders, vector<Orders>, SellComparator> sellingOrders;
+
+  
 };
 
 class Market {
@@ -63,8 +68,16 @@ public:
   // Setting argument for valid mode
   void getMode(int argc, char** argv);
 
-  // receive a series of “orders”
+  // Receive a series of “orders”
   void getOrders();
+
+  // TODO: Create a separate function as referenced above, accepting a stream
+  //       reference variable, to which you will pass cin or a stringstream
+  //       that is populated by PR_init()
+  void processOrders(istream &inputStream);
+
+  // Executing trade
+  void trade();
 
 
   // MOVE TO PRIVATE AFTER TEST
@@ -82,8 +95,8 @@ public:
 
   bool time_travelers = false;
 
-  priority_queue<Orders, vector<Orders>, BuyComparator> buyingOrders;
-  priority_queue<Orders, vector<Orders>, SellComparator> sellingOrders;
+  vector<Orders> timeTraveler;
+  vector<Stocks> stockList;
 
 private:
 

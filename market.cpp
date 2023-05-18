@@ -21,6 +21,17 @@ void Market::readFileHeader() {
   cin >> junk; // "NUM_STOCKS: "
 
   cin >> num_stocks;
+
+  // Resize stockList to num_stocks
+  stockList.resize(static_cast<size_t>(num_stocks));
+
+  // //TEST
+  // for (size_t i = 0; i < stockList.size(); ++i) {
+  //   if (stockList[i].buyingOrders.empty() &&
+  //       stockList[i].sellingOrders.empty()) {
+  //     cout << "empty" << endl;
+  //   }
+  // }
 }
 
 void Market::getMode(int argc, char** argv) {
@@ -73,9 +84,12 @@ void Market::getOrders() {
 
   string junk;
   char chunk;
-  int count = 0;
 
   if (mode == "TL") {
+
+    int count = 0;
+    int curr_timestamp = 0;
+
     while (cin >> order.timestamp
                >> order.intent >> junk // BUY or SELL
                >> chunk >> order.trader_id // T_
@@ -109,20 +123,92 @@ void Market::getOrders() {
                   exit(1);
                 }
 
+                if (curr_timestamp > order.timestamp) {
+                  cerr << "Error: Decreasing timestamp" << endl;
+                  exit(1);
+                }
+
                 order.placement = count;
                 ++count;
 
+                // decreasing timestamp
+                curr_timestamp = order.timestamp; 
+
                 if (order.intent == 'B') {
-                  buyingOrders.push(order);
+                  stockList[static_cast<size_t>(order.stock_id)]
+                  .buyingOrders.push(order);
                 }
                 else if (order.intent == 'S') {
-                  sellingOrders.push(order);
+                  stockList[static_cast<size_t>(order.stock_id)]
+                  .sellingOrders.push(order);
                 }
                 else {
                   cerr << "Error: Invalid order intent" << endl;
                   exit(1);
                 }
 
+                // TODO: processing time traveler mode and median mode
+
                } // while ... cin each order
   } // if ... TL mode
+
+  else if (mode == "PR") {
+    int seed;
+    int num_orders;
+    int rate;
+
+    cin >> junk >> seed >> junk >> num_orders >> junk >> rate;
+
+    stringstream ss;
+
+    P2random::PR_init(ss, static_cast<unsigned int>(seed),
+                      static_cast<unsigned int>(num_traders), 
+                      static_cast<unsigned int>(num_stocks),
+                      static_cast<unsigned int>(num_orders),
+                      static_cast<unsigned int>(rate));
+
+    // processOrders
+
+  } // else if ... PR mode
 } // getOrders()
+
+void Market::processOrders(istream &inputStream) {
+  Orders order;
+
+  string junk;
+  char chunk;
+  int count = 0;
+  // int curr_timestamp = 0;
+
+  // Read orders from inputStream, NOT cin
+  while (inputStream >> order.timestamp >> order.intent >> junk >> chunk
+                     >> order.trader_id >> chunk >> order.stock_id >> chunk
+                     >> order.price >> chunk >> order.quantity) {
+    // process orders
+    order.placement = count;
+    ++count;
+
+    // // Decreasing timestamp
+    // curr_timestamp = order.timestamp;
+
+    if (order.intent == 'B') {
+      stockList[static_cast<size_t>(order.stock_id)]
+      .buyingOrders.push(order);
+    }
+    else if (order.intent == 'S') {
+      stockList[static_cast<size_t>(order.stock_id)]
+      .sellingOrders.push(order);
+    }
+    else {
+      cerr << "Error: Invalid order intent" << endl;
+      exit(1);
+    }
+
+    // TODO: processing time traveler mode and median mode
+
+  }  // while ..inputStream
+} // processOrders()
+
+// void Market::trade() {
+  
+// }
