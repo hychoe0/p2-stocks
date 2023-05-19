@@ -82,6 +82,8 @@ public:
   void printVerbose(int buyerID, int sellQuantity, int stockID, 
                     int sellerID, int soldPrice);
 
+  void printResult();
+
 
   // MOVE TO PRIVATE AFTER TEST
   int num_traders;
@@ -100,6 +102,8 @@ public:
 
   vector<Orders> timeTraveler;
   vector<Stocks> stockList;
+
+  int total_trade;
 
 private:
 

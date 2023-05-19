@@ -11,9 +11,12 @@ int main(int argc, char** argv) {
 
   market.readFileHeader();
   market.getMode(argc, argv);
-  market.getOrders();
 
   cout << "Processing orders...\n";
+  
+  market.getOrders();
+
+  
 
   // // TEST
   // for (int i = 0; i < market.num_stocks; ++i) {

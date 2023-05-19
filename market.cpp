@@ -84,6 +84,7 @@ void Market::getOrders() {
 
   string junk;
   char chunk;
+  total_trade = 0;
 
   if (mode == "TL") {
 
@@ -148,6 +149,7 @@ void Market::getOrders() {
       // TODO: processing time traveler mode and median mode
       trade();
       } // while ... cin each order
+
   } // if ... TL mode
 
   else if (mode == "PR") {
@@ -168,6 +170,10 @@ void Market::getOrders() {
     processOrders(ss);
 
   } // else if ... PR mode
+
+  // End of Day...
+  printResult();
+
 } // getOrders()
 
 void Market::processOrders(istream &inputStream) {
@@ -201,13 +207,10 @@ void Market::processOrders(istream &inputStream) {
     }
 
     // TODO: processing time traveler mode and median mode
+    trade();
 
   }  // while ..inputStream
 } // processOrders()
-
-// void Market::completeTrade(vector<Stocks> &stockList, size_t stockID) {
-  
-// } // completeTrade()
 
 void Market::trade() {
   for (size_t stockID = 0;
@@ -216,15 +219,15 @@ void Market::trade() {
 
     while (!stockList[stockID].buyingOrders.empty() &&
            !stockList[stockID].sellingOrders.empty()) {
-      Orders topBuyOrder = stockList[stockID].buyingOrders.top();
-      Orders topSellOrder = stockList[stockID].sellingOrders.top();
+      // Orders topBuyOrder = stockList[stockID].buyingOrders.top();
+      // Orders topSellOrder = stockList[stockID].sellingOrders.top();
 
       // if selling price is higher than buying price, trade doesn't work
       if (stockList[stockID].buyingOrders.top().price <
           stockList[stockID].sellingOrders.top().price) {
         break;
       }
-      
+
       // trade happens (successful trade)
       else {
         // When buyQ > sellQ, buyQ - sellQ
@@ -235,20 +238,33 @@ void Market::trade() {
           // then the price of the match will be the buyer's price
           if (stockList[stockID].buyingOrders.top().placement >
               stockList[stockID].sellingOrders.top().placement) {
-                
             if (verbose) {
               printVerbose(stockList[stockID].buyingOrders.top().trader_id,
                           stockList[stockID].sellingOrders.top().quantity,
                           static_cast<int>(stockID),
                           stockList[stockID].sellingOrders.top().trader_id,
                           stockList[stockID].sellingOrders.top().price);
-            }
-          } // if ... buyingOrder came first
+            } // if ... verbose
+          } // if ... sellingOrder came first
+          else {
+            if (verbose) {
+              printVerbose(stockList[stockID].buyingOrders.top().trader_id,
+                          stockList[stockID].sellingOrders.top().quantity,
+                          static_cast<int>(stockID),
+                          stockList[stockID].sellingOrders.top().trader_id,
+                          stockList[stockID].buyingOrders.top().price);
+            } // if ... verbose
+          } // else ... buyingOrder came first
 
-          topBuyOrder.quantity -= topSellOrder.quantity;
+          Orders modifiedStock = stockList[stockID].buyingOrders.top();
+
+          modifiedStock.quantity -=
+          stockList[stockID].sellingOrders.top().quantity;
+
           stockList[stockID].sellingOrders.pop();
           stockList[stockID].buyingOrders.pop();
-          stockList[stockID].buyingOrders.push(topBuyOrder);
+          stockList[stockID].buyingOrders.push(modifiedStock);
+          ++total_trade;
           
         } // if ... buyingOrder.quantity > sellingOrder.quantity
 
@@ -256,29 +272,70 @@ void Market::trade() {
         else if (stockList[stockID].buyingOrders.top().quantity <
                 stockList[stockID].sellingOrders.top().quantity) {
           
-          if (verbose) {
-            printVerbose(stockList[stockID].buyingOrders.top().trader_id,
-                         stockList[stockID].buyingOrders.top().quantity,
-                         static_cast<int>(stockID),
-                         stockList[stockID].sellingOrders.top().trader_id,
-                         stockList[stockID].sellingOrders.top().price);
-          }
-          topSellOrder.quantity -= topBuyOrder.quantity;
+          // if the BUY order arrived first,
+          // then the price of the match will be the buyer's price
+          if (stockList[stockID].buyingOrders.top().placement >
+              stockList[stockID].sellingOrders.top().placement) {
+            if (verbose) {
+              printVerbose(stockList[stockID].buyingOrders.top().trader_id,
+                          stockList[stockID].buyingOrders.top().quantity,
+                          static_cast<int>(stockID),
+                          stockList[stockID].sellingOrders.top().trader_id,
+                          stockList[stockID].sellingOrders.top().price);
+            } // if ... verbose
+          } // if ... sellingOrder came first
+          else {
+            if (verbose) {
+              printVerbose(stockList[stockID].buyingOrders.top().trader_id,
+                          stockList[stockID].buyingOrders.top().quantity,
+                          static_cast<int>(stockID),
+                          stockList[stockID].sellingOrders.top().trader_id,
+                          stockList[stockID].buyingOrders.top().price);
+            } // if ... verbose
+          } // else ... buyingOrder came first
+
+          Orders modifiedStock = stockList[stockID].sellingOrders.top();
+
+          modifiedStock.quantity -=
+          stockList[stockID].buyingOrders.top().quantity;
+
           stockList[stockID].sellingOrders.pop();
           stockList[stockID].buyingOrders.pop();
-          stockList[stockID].buyingOrders.push(topSellOrder);
+          stockList[stockID].sellingOrders.push(modifiedStock);
+          ++total_trade;
 
         } // if ... buyingOrder.quantity < sellingOrder.quantity
+
         else {
+          if (stockList[stockID].buyingOrders.top().placement >
+              stockList[stockID].sellingOrders.top().placement) {
+            if (verbose) {
+              printVerbose(stockList[stockID].buyingOrders.top().trader_id,
+                          stockList[stockID].buyingOrders.top().quantity,
+                          static_cast<int>(stockID),
+                          stockList[stockID].sellingOrders.top().trader_id,
+                          stockList[stockID].sellingOrders.top().price);
+            } // if ... verbose
+          } // if ... sellingOrder came first
+          else {
+            if (verbose) {
+              printVerbose(stockList[stockID].buyingOrders.top().trader_id,
+                          stockList[stockID].buyingOrders.top().quantity,
+                          static_cast<int>(stockID),
+                          stockList[stockID].sellingOrders.top().trader_id,
+                          stockList[stockID].buyingOrders.top().price);
+            } // if ... verbose
+          } // else ... buyingOrder came first
+
           // When both have same quantity, both pop from pq ("complete trade")
           stockList[stockID].buyingOrders.pop();
-          stockList[stockID].buyingOrders.pop();
-        } // else ... buyingOrder.quantity == sellingOrder.quantity
-      } // else ... when trade happens
-                // completed trade
-                // if (verbose)
-                // buyer purchased with selling price
+          stockList[stockID].sellingOrders.pop();
+          ++total_trade;
 
+        } // else ... buyingOrder.quantity == sellingOrder.quantity
+
+      } // else ... when successful trade happens
+              
     } // while ... stockList[stockID].buy and sell.empty()
   } // for ... stockID < num_stocks
 } // trade()
@@ -290,4 +347,8 @@ void Market::printVerbose(int buyerID, int sellQuantity, int stockID,
        << " shares of Stock " << stockID << " from Trader "
        << sellerID << " for $" << soldPrice << "/share\n";
 
+}
+
+void Market::printResult() {
+  cout << "---End of Day---\n" << "Trades Completed: " << total_trade << "\n";
 }
