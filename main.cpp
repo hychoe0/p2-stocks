@@ -19,6 +19,8 @@ int main(int argc, char** argv) {
   for (int i = 0; i < market.num_stocks; ++i) {
     Orders topBuyingOrder = market.stockList[static_cast<size_t>(i)].buyingOrders.top();
     Orders topSellingOrder = market.stockList[static_cast<size_t>(i)].sellingOrders.top();
+    // market.stockList[static_cast<size_t>(i)].sellingOrders.pop();
+    // topSellingOrder = market.stockList[static_cast<size_t>(i)].sellingOrders.top();
 
     cout << "Top Buying Order for Stock "
          << topBuyingOrder.stock_id << ": " << topBuyingOrder.timestamp << " "

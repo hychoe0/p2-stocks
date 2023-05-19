@@ -25,13 +25,13 @@ void Market::readFileHeader() {
   // Resize stockList to num_stocks
   stockList.resize(static_cast<size_t>(num_stocks));
 
-  //TEST
-  for (size_t i = 0; i < stockList.size(); ++i) {
-    if (stockList[i].buyingOrders.empty() &&
-        stockList[i].sellingOrders.empty()) {
-      cout << "empty" << endl;
-    }
-  }
+  // //TEST
+  // for (size_t i = 0; i < stockList.size(); ++i) {
+  //   if (stockList[i].buyingOrders.empty() &&
+  //       stockList[i].sellingOrders.empty()) {
+  //     cout << "empty" << endl;
+  //   }
+  // }
 }
 
 void Market::getMode(int argc, char** argv) {
@@ -97,59 +97,57 @@ void Market::getOrders() {
                >> chunk >> order.price // $_
                >> chunk >> order.quantity // #_
                ) {
-                // Error handling
-                if (order.timestamp < 0) {
-                  cerr << "Error: Negative timestamp" << endl;
-                  exit(1);
-                }
+      // Error handling
+      if (order.timestamp < 0) {
+        cerr << "Error: Negative timestamp" << endl;
+        exit(1);
+      }
 
-                if (order.trader_id < 0 || order.trader_id >= num_traders) {
-                  cerr << "Error: Invalid trader ID" << endl;
-                  exit(1);
-                }
+      if (order.trader_id < 0 || order.trader_id >= num_traders) {
+        cerr << "Error: Invalid trader ID" << endl;
+        exit(1);
+      }
 
-                if (order.stock_id < 0 || order.stock_id >= num_stocks) {
-                  cerr << "Error: Invalid stock ID" << endl;
-                  exit(1);
-                }
+      if (order.stock_id < 0 || order.stock_id >= num_stocks) {
+        cerr << "Error: Invalid stock ID" << endl;
+        exit(1);
+      }
 
-                if (order.price < 0) {
-                  cerr << "Error: Invalid price" << endl;
-                  exit(1);
-                }
+      if (order.price < 0) {
+        cerr << "Error: Invalid price" << endl;
+        exit(1);
+      }
 
-                if (order.quantity < 0) {
-                  cerr << "Error: Invalid quantity" << endl;
-                  exit(1);
-                }
+      if (order.quantity < 0) {
+        cerr << "Error: Invalid quantity" << endl;
+        exit(1);
+      }
 
-                if (curr_timestamp > order.timestamp) {
-                  cerr << "Error: Decreasing timestamp" << endl;
-                  exit(1);
-                }
+      if (curr_timestamp > order.timestamp) {
+        cerr << "Error: Decreasing timestamp" << endl;
+        exit(1);
+      }
 
-                order.placement = count;
-                ++count;
+      order.placement = count;
+      ++count;
 
-                // decreasing timestamp
-                curr_timestamp = order.timestamp; 
+      // decreasing timestamp
+      curr_timestamp = order.timestamp; 
 
-                if (order.intent == 'B') {
-                  stockList[static_cast<size_t>(order.stock_id)]
-                  .buyingOrders.push(order);
-                }
-                else if (order.intent == 'S') {
-                  stockList[static_cast<size_t>(order.stock_id)]
-                  .sellingOrders.push(order);
-                }
-                else {
-                  cerr << "Error: Invalid order intent" << endl;
-                  exit(1);
-                }
+      if (order.intent == 'B') {
+        stockList[static_cast<size_t>(order.stock_id)].buyingOrders.push(order);
+      }
+      else if (order.intent == 'S') {
+        stockList[static_cast<size_t>(order.stock_id)].sellingOrders.push(order);
+      }
+      else {
+        cerr << "Error: Invalid order intent" << endl;
+        exit(1);
+      }
 
-                // TODO: processing time traveler mode and median mode
-
-               } // while ... cin each order
+      // TODO: processing time traveler mode and median mode
+      trade();
+      } // while ... cin each order
   } // if ... TL mode
 
   else if (mode == "PR") {
@@ -167,7 +165,7 @@ void Market::getOrders() {
                       static_cast<unsigned int>(num_orders),
                       static_cast<unsigned int>(rate));
 
-    // processOrders
+    processOrders(ss);
 
   } // else if ... PR mode
 } // getOrders()
@@ -207,6 +205,61 @@ void Market::processOrders(istream &inputStream) {
   }  // while ..inputStream
 } // processOrders()
 
-// void Market::trade() {
+// void Market::completeTrade(vector<Stocks> &stockList, size_t stockID) {
   
-// }
+// } // completeTrade()
+
+void Market::trade() {
+  for (size_t stockID = 0;
+       stockID < static_cast<size_t>(num_stocks);
+       ++stockID) {
+
+    while (!stockList[stockID].buyingOrders.empty() &&
+           !stockList[stockID].sellingOrders.empty()) {
+      Orders topBuyOrder = stockList[stockID].buyingOrders.top();
+      Orders topSellOrder = stockList[stockID].sellingOrders.top();
+
+      // if selling price is higher than buying price, trade doesn't work
+      if (stockList[stockID].buyingOrders.top().price <
+          stockList[stockID].sellingOrders.top().price) {
+        break;
+      }
+      // else if (stockList[stockID].buyingOrders.top().price >=
+      //          stockList[stockID].sellingOrders.top().price) {
+      // trade happens
+      else {
+        if (stockList[stockID].buyingOrders.top().quantity >
+            stockList[stockID].sellingOrders.top().quantity) {
+          // When buyQ > sellQ, buyQ - sellQ and sellingOrder.pop()
+          // successful trade
+          topBuyOrder.quantity -= topSellOrder.quantity;
+          stockList[stockID].sellingOrders.pop();
+          stockList[stockID].buyingOrders.pop();
+          stockList[stockID].buyingOrders.push(topBuyOrder);
+          cout << "buyQ > sellQ" << endl;
+          
+        } // if ... buyingOrder.quantity > sellingOrder.quantity
+        else if (stockList[stockID].buyingOrders.top().quantity <
+                stockList[stockID].sellingOrders.top().quantity) {
+          // When sellQ > buyQ, sellQ - buyQ and buyingOrder.pop()
+          // successful trade
+          topSellOrder.quantity -= topBuyOrder.quantity;
+          stockList[stockID].sellingOrders.pop();
+          stockList[stockID].buyingOrders.pop();
+          stockList[stockID].buyingOrders.push(topSellOrder);
+          cout << "sellQ > buyQ" << endl;
+
+        } // if ... buyingOrder.quantity < sellingOrder.quantity
+        else {
+          // When both have same quantity, both pop from pq ("complete trade")
+          stockList[stockID].buyingOrders.pop();
+          stockList[stockID].buyingOrders.pop();
+        } // else ... buyingOrder.quantity == sellingOrder.quantity
+      } // else ... when trade happens
+                // completed trade
+                // if (verbose)
+                // buyer purchased with selling price
+
+    } // while ... stockList[stockID].buy and sell.empty()
+  } // for ... stockID < num_stocks
+} // trade()

@@ -29,9 +29,8 @@ struct Orders {
         : timestamp(ts), intent(i), trader_id(tId), stock_id(sId), price(p), quantity(q) {}
 };
 
-// Comparator for buying orders (higher price has higher priority)
 struct BuyComparator {
-  bool operator()(const Orders& o1, const Orders& o2) const {
+  bool operator()(const Orders& o1, const Orders& o2) {
     if (o1.price == o2.price) {
       return o1.placement > o2.placement;
     }
@@ -39,9 +38,8 @@ struct BuyComparator {
   }
 };
 
-// Comparator for selling orders (lower price has higher priority)
 struct SellComparator {
-    bool operator()(const Orders& o1, const Orders& o2) const {
+    bool operator()(const Orders& o1, const Orders& o2) {
       if (o1.price == o2.price) {
         return o1.placement > o2.placement;
       }
@@ -75,6 +73,8 @@ public:
   //       reference variable, to which you will pass cin or a stringstream
   //       that is populated by PR_init()
   void processOrders(istream &inputStream);
+
+  void completeTrade(vector<Stocks> &stockList, size_t stockID);
 
   // Executing trade
   void trade();

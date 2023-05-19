@@ -11,7 +11,7 @@
       "program": "${workspaceFolder}/market_debug",
       "args": [
         "<",
-        "small-input-PR.txt"
+        "test-2-i.txt"
       ],
       "cwd": "${workspaceFolder}"
     }
