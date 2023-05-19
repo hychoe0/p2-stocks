@@ -79,6 +79,9 @@ public:
   // Executing trade
   void trade();
 
+  void printVerbose(int buyerID, int sellQuantity, int stockID, 
+                    int sellerID, int soldPrice);
+
 
   // MOVE TO PRIVATE AFTER TEST
   int num_traders;

@@ -224,30 +224,49 @@ void Market::trade() {
           stockList[stockID].sellingOrders.top().price) {
         break;
       }
-      // else if (stockList[stockID].buyingOrders.top().price >=
-      //          stockList[stockID].sellingOrders.top().price) {
-      // trade happens
+      
+      // trade happens (successful trade)
       else {
+        // When buyQ > sellQ, buyQ - sellQ
         if (stockList[stockID].buyingOrders.top().quantity >
             stockList[stockID].sellingOrders.top().quantity) {
-          // When buyQ > sellQ, buyQ - sellQ and sellingOrder.pop()
-          // successful trade
+
+          // if the BUY order arrived first,
+          // then the price of the match will be the buyer's price
+          if (stockList[stockID].buyingOrders.top().placement >
+              stockList[stockID].sellingOrders.top().placement) {
+                
+            if (verbose) {
+              printVerbose(stockList[stockID].buyingOrders.top().trader_id,
+                          stockList[stockID].sellingOrders.top().quantity,
+                          static_cast<int>(stockID),
+                          stockList[stockID].sellingOrders.top().trader_id,
+                          stockList[stockID].sellingOrders.top().price);
+            }
+          } // if ... buyingOrder came first
+
           topBuyOrder.quantity -= topSellOrder.quantity;
           stockList[stockID].sellingOrders.pop();
           stockList[stockID].buyingOrders.pop();
           stockList[stockID].buyingOrders.push(topBuyOrder);
-          cout << "buyQ > sellQ" << endl;
           
         } // if ... buyingOrder.quantity > sellingOrder.quantity
+
+        // When sellQ > buyQ, sellQ - buyQ
         else if (stockList[stockID].buyingOrders.top().quantity <
                 stockList[stockID].sellingOrders.top().quantity) {
-          // When sellQ > buyQ, sellQ - buyQ and buyingOrder.pop()
-          // successful trade
+          
+          if (verbose) {
+            printVerbose(stockList[stockID].buyingOrders.top().trader_id,
+                         stockList[stockID].buyingOrders.top().quantity,
+                         static_cast<int>(stockID),
+                         stockList[stockID].sellingOrders.top().trader_id,
+                         stockList[stockID].sellingOrders.top().price);
+          }
           topSellOrder.quantity -= topBuyOrder.quantity;
           stockList[stockID].sellingOrders.pop();
           stockList[stockID].buyingOrders.pop();
           stockList[stockID].buyingOrders.push(topSellOrder);
-          cout << "sellQ > buyQ" << endl;
 
         } // if ... buyingOrder.quantity < sellingOrder.quantity
         else {
@@ -263,3 +282,12 @@ void Market::trade() {
     } // while ... stockList[stockID].buy and sell.empty()
   } // for ... stockID < num_stocks
 } // trade()
+
+void Market::printVerbose(int buyerID, int sellQuantity, int stockID,
+                          int sellerID, int soldPrice) {
+  
+  cout << "Trader " << buyerID << " purchased " << sellQuantity
+       << " shares of Stock " << stockID << " from Trader "
+       << sellerID << " for $" << soldPrice << "/share\n";
+
+}

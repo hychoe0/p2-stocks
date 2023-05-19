@@ -15,25 +15,25 @@ int main(int argc, char** argv) {
 
   cout << "Processing orders...\n";
 
-  // TEST
-  for (int i = 0; i < market.num_stocks; ++i) {
-    Orders topBuyingOrder = market.stockList[static_cast<size_t>(i)].buyingOrders.top();
-    Orders topSellingOrder = market.stockList[static_cast<size_t>(i)].sellingOrders.top();
-    // market.stockList[static_cast<size_t>(i)].sellingOrders.pop();
-    // topSellingOrder = market.stockList[static_cast<size_t>(i)].sellingOrders.top();
+  // // TEST
+  // for (int i = 0; i < market.num_stocks; ++i) {
+  //   Orders topBuyingOrder = market.stockList[static_cast<size_t>(i)].buyingOrders.top();
+  //   Orders topSellingOrder = market.stockList[static_cast<size_t>(i)].sellingOrders.top();
+  //   // market.stockList[static_cast<size_t>(i)].sellingOrders.pop();
+  //   // topSellingOrder = market.stockList[static_cast<size_t>(i)].sellingOrders.top();
 
-    cout << "Top Buying Order for Stock "
-         << topBuyingOrder.stock_id << ": " << topBuyingOrder.timestamp << " "
-         << topBuyingOrder.intent << " " << topBuyingOrder.trader_id << " "
-         << topBuyingOrder.stock_id << " " << topBuyingOrder.price << " "
-         << topBuyingOrder.quantity << " " << topBuyingOrder.placement << endl;
+  //   cout << "Top Buying Order for Stock "
+  //        << topBuyingOrder.stock_id << ": " << topBuyingOrder.timestamp << " "
+  //        << topBuyingOrder.intent << " " << topBuyingOrder.trader_id << " "
+  //        << topBuyingOrder.stock_id << " " << topBuyingOrder.price << " "
+  //        << topBuyingOrder.quantity << " " << topBuyingOrder.placement << endl;
 
-    cout << "Top Selling Order for Stock "
-         << topSellingOrder.stock_id << ": " << topSellingOrder.timestamp << " "
-         << topSellingOrder.intent << " " << topSellingOrder.trader_id << " "
-         << topSellingOrder.stock_id << " " << topSellingOrder.price << " "
-         << topSellingOrder.quantity << " " << topSellingOrder.placement << endl;
-  }
+  //   cout << "Top Selling Order for Stock "
+  //        << topSellingOrder.stock_id << ": " << topSellingOrder.timestamp << " "
+  //        << topSellingOrder.intent << " " << topSellingOrder.trader_id << " "
+  //        << topSellingOrder.stock_id << " " << topSellingOrder.price << " "
+  //        << topSellingOrder.quantity << " " << topSellingOrder.placement << endl;
+  // }
   
 
   // cout << market.mode << endl;
