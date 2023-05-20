@@ -3,6 +3,7 @@
 #include "market.h"
 #include <iostream>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -132,19 +133,27 @@ void Market::getOrders() {
       order.placement = count;
       ++count;
 
-      // decreasing timestamp
-      curr_timestamp = order.timestamp; 
-
       if (order.intent == 'B') {
-        stockList[static_cast<size_t>(order.stock_id)].buyingOrders.push(order);
+        stockList[static_cast<size_t>(order.stock_id)].
+        buyingOrders.push(order);
       }
       else if (order.intent == 'S') {
-        stockList[static_cast<size_t>(order.stock_id)].sellingOrders.push(order);
+        stockList[static_cast<size_t>(order.stock_id)].
+        sellingOrders.push(order);
       }
       else {
         cerr << "Error: Invalid order intent" << endl;
         exit(1);
       }
+
+      // This means the timestamp of the order changed
+      if (curr_timestamp != order.timestamp && median) {
+        for (int stockID = 0; stockID < num_stocks; ++stockID) {
+          // calculateMedian(stockList[stockID].matchOrders);
+        }
+      }
+      // decreasing timestamp
+      curr_timestamp = order.timestamp; 
 
       // TODO: processing time traveler mode and median mode
       trade();
@@ -174,6 +183,10 @@ void Market::getOrders() {
   // End of Day...
   printResult();
 
+  if (trader_info) {
+    
+  }
+
 } // getOrders()
 
 void Market::processOrders(istream &inputStream) {
@@ -188,6 +201,19 @@ void Market::processOrders(istream &inputStream) {
   while (inputStream >> order.timestamp >> order.intent >> junk >> chunk
                      >> order.trader_id >> chunk >> order.stock_id >> chunk
                      >> order.price >> chunk >> order.quantity) {
+
+    // // to output PR in TL mode      
+    // string b_s;
+    // if (order.intent == 'B') {
+    //   b_s = "BUY";
+    // }
+    // else {
+    //   b_s = "SELL";
+    // }
+    // cout << order.timestamp << " " << b_s << " T" << order.trader_id
+    //       << " S" << order.stock_id << " $" << order.price << " #"
+    //       << order.quantity << endl;
+
     // process orders
     order.placement = count;
     ++count;
@@ -245,7 +271,14 @@ void Market::trade() {
                           stockList[stockID].sellingOrders.top().trader_id,
                           stockList[stockID].sellingOrders.top().price);
             } // if ... verbose
+
+            if (median) {
+              stockList[stockID].matchOrders.push_back
+              (stockList[stockID].sellingOrders.top().price);
+            } // if .. median
+
           } // if ... sellingOrder came first
+
           else {
             if (verbose) {
               printVerbose(stockList[stockID].buyingOrders.top().trader_id,
@@ -254,6 +287,12 @@ void Market::trade() {
                           stockList[stockID].sellingOrders.top().trader_id,
                           stockList[stockID].buyingOrders.top().price);
             } // if ... verbose
+
+            if (median) {
+              stockList[stockID].matchOrders.push_back
+              (stockList[stockID].buyingOrders.top().price);
+            } // if .. median
+
           } // else ... buyingOrder came first
 
           Orders modifiedStock = stockList[stockID].buyingOrders.top();
@@ -283,6 +322,12 @@ void Market::trade() {
                           stockList[stockID].sellingOrders.top().trader_id,
                           stockList[stockID].sellingOrders.top().price);
             } // if ... verbose
+
+            if (median) {
+              stockList[stockID].matchOrders.push_back
+              (stockList[stockID].sellingOrders.top().price);
+            } // if .. median
+
           } // if ... sellingOrder came first
           else {
             if (verbose) {
@@ -292,6 +337,12 @@ void Market::trade() {
                           stockList[stockID].sellingOrders.top().trader_id,
                           stockList[stockID].buyingOrders.top().price);
             } // if ... verbose
+
+            if (median) {
+              stockList[stockID].matchOrders.push_back
+              (stockList[stockID].buyingOrders.top().price);
+            } // if .. median
+
           } // else ... buyingOrder came first
 
           Orders modifiedStock = stockList[stockID].sellingOrders.top();
@@ -316,6 +367,12 @@ void Market::trade() {
                           stockList[stockID].sellingOrders.top().trader_id,
                           stockList[stockID].sellingOrders.top().price);
             } // if ... verbose
+
+            if (median) {
+              stockList[stockID].matchOrders.push_back
+              (stockList[stockID].sellingOrders.top().price);
+            } // if .. median
+
           } // if ... sellingOrder came first
           else {
             if (verbose) {
@@ -325,6 +382,12 @@ void Market::trade() {
                           stockList[stockID].sellingOrders.top().trader_id,
                           stockList[stockID].buyingOrders.top().price);
             } // if ... verbose
+
+            if (median) {
+              stockList[stockID].matchOrders.push_back
+              (stockList[stockID].buyingOrders.top().price);
+            } // if .. median
+
           } // else ... buyingOrder came first
 
           // When both have same quantity, both pop from pq ("complete trade")
@@ -351,4 +414,19 @@ void Market::printVerbose(int buyerID, int sellQuantity, int stockID,
 
 void Market::printResult() {
   cout << "---End of Day---\n" << "Trades Completed: " << total_trade << "\n";
+}
+
+int Market::calculateMedian(vector<int> &orders) {
+  sort(orders.begin(), orders.end()); // Sort in ascending Order
+
+  if (orders.size() % 2 == 0) {
+    int middle1 = orders[(orders.size() / 2) - 1];
+    int middle2 = orders[orders.size() / 2];
+    return (middle1 + middle2) / 2;
+  } // if ... order is EVEN
+  
+  else {
+    return orders[orders.size() / 2];
+  } // else ... order is ODD
+
 }
