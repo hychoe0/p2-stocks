@@ -23,8 +23,10 @@ void Market::readFileHeader() {
 
   cin >> num_stocks;
 
-  // Resize stockList to num_stocks
+  // Initialize stockList to num_stocks
   stockList.resize(static_cast<size_t>(num_stocks));
+  // Initialize stockList to num_traders
+  traderList.resize(static_cast<size_t>(num_traders));
 
   // //TEST
   // for (size_t i = 0; i < stockList.size(); ++i) {
@@ -206,7 +208,12 @@ void Market::getOrders() {
   printResult();
 
   if (trader_info) {
-    
+    cout << "---Trader Info---\n";
+    for (size_t id = 0; id < static_cast<size_t>(num_traders); ++id) {
+      cout << "Trader " << id << " bought " << traderList[id].purchase
+           << " and sold " << traderList[id].sale << " for a net transfer of "
+           << "$" << traderList[id].net << "\n";
+    }
   }
 
 } // getOrders()
@@ -319,6 +326,28 @@ void Market::trade() {
               (stockList[stockID].sellingOrders.top().price);
             } // if .. median
 
+            if (trader_info) {
+              size_t buy_id =
+              static_cast<size_t>(stockList[stockID].buyingOrders.top().trader_id);
+              
+              size_t sell_id =
+              static_cast<size_t>(stockList[stockID].sellingOrders.top().trader_id);
+
+              traderList[buy_id].purchase +=
+              stockList[stockID].sellingOrders.top().quantity;
+              
+              traderList[sell_id].sale +=
+              stockList[stockID].sellingOrders.top().quantity;
+              
+              traderList[sell_id].net +=
+              stockList[stockID].sellingOrders.top().quantity * 
+              stockList[stockID].sellingOrders.top().price;
+
+              traderList[buy_id].net -=
+              stockList[stockID].sellingOrders.top().quantity * 
+              stockList[stockID].sellingOrders.top().price;
+            } // if ... trader_info
+
           } // if ... sellingOrder came first
 
           else {
@@ -334,6 +363,28 @@ void Market::trade() {
               stockList[stockID].matchOrders.push_back
               (stockList[stockID].buyingOrders.top().price);
             } // if .. median
+
+            if (trader_info) {
+              size_t buy_id =
+              static_cast<size_t>(stockList[stockID].buyingOrders.top().trader_id);
+              
+              size_t sell_id =
+              static_cast<size_t>(stockList[stockID].sellingOrders.top().trader_id);
+
+              traderList[buy_id].purchase +=
+              stockList[stockID].sellingOrders.top().quantity;
+              
+              traderList[sell_id].sale +=
+              stockList[stockID].sellingOrders.top().quantity;
+              
+              traderList[sell_id].net +=
+              stockList[stockID].sellingOrders.top().quantity * 
+              stockList[stockID].buyingOrders.top().price;
+
+              traderList[buy_id].net -=
+              stockList[stockID].sellingOrders.top().quantity * 
+              stockList[stockID].buyingOrders.top().price;
+            } // if ... trader_info
 
           } // else ... buyingOrder came first
 
@@ -370,6 +421,28 @@ void Market::trade() {
               (stockList[stockID].sellingOrders.top().price);
             } // if .. median
 
+            if (trader_info) {
+              size_t buy_id =
+              static_cast<size_t>(stockList[stockID].buyingOrders.top().trader_id);
+              
+              size_t sell_id =
+              static_cast<size_t>(stockList[stockID].sellingOrders.top().trader_id);
+
+              traderList[buy_id].purchase +=
+              stockList[stockID].buyingOrders.top().quantity;
+              
+              traderList[sell_id].sale +=
+              stockList[stockID].buyingOrders.top().quantity;
+              
+              traderList[sell_id].net +=
+              stockList[stockID].buyingOrders.top().quantity * 
+              stockList[stockID].sellingOrders.top().price;
+
+              traderList[buy_id].net -=
+              stockList[stockID].buyingOrders.top().quantity * 
+              stockList[stockID].sellingOrders.top().price;
+            } // if ... trader_info
+
           } // if ... sellingOrder came first
           else {
             if (verbose) {
@@ -384,6 +457,28 @@ void Market::trade() {
               stockList[stockID].matchOrders.push_back
               (stockList[stockID].buyingOrders.top().price);
             } // if .. median
+
+            if (trader_info) {
+              size_t buy_id =
+              static_cast<size_t>(stockList[stockID].buyingOrders.top().trader_id);
+              
+              size_t sell_id =
+              static_cast<size_t>(stockList[stockID].sellingOrders.top().trader_id);
+
+              traderList[buy_id].purchase +=
+              stockList[stockID].buyingOrders.top().quantity;
+              
+              traderList[sell_id].sale +=
+              stockList[stockID].buyingOrders.top().quantity;
+              
+              traderList[sell_id].net +=
+              stockList[stockID].buyingOrders.top().quantity * 
+              stockList[stockID].buyingOrders.top().price;
+
+              traderList[buy_id].net -=
+              stockList[stockID].buyingOrders.top().quantity * 
+              stockList[stockID].buyingOrders.top().price;
+            } // if ... trader_info
 
           } // else ... buyingOrder came first
 
@@ -415,6 +510,28 @@ void Market::trade() {
               (stockList[stockID].sellingOrders.top().price);
             } // if .. median
 
+            if (trader_info) {
+              size_t buy_id =
+              static_cast<size_t>(stockList[stockID].buyingOrders.top().trader_id);
+              
+              size_t sell_id =
+              static_cast<size_t>(stockList[stockID].sellingOrders.top().trader_id);
+
+              traderList[buy_id].purchase +=
+              stockList[stockID].buyingOrders.top().quantity;
+              
+              traderList[sell_id].sale +=
+              stockList[stockID].buyingOrders.top().quantity;
+              
+              traderList[sell_id].net +=
+              stockList[stockID].buyingOrders.top().quantity * 
+              stockList[stockID].sellingOrders.top().price;
+
+              traderList[buy_id].net -=
+              stockList[stockID].buyingOrders.top().quantity * 
+              stockList[stockID].sellingOrders.top().price;
+            } // if ... trader_info
+
           } // if ... sellingOrder came first
           else {
             if (verbose) {
@@ -429,6 +546,28 @@ void Market::trade() {
               stockList[stockID].matchOrders.push_back
               (stockList[stockID].buyingOrders.top().price);
             } // if .. median
+
+            if (trader_info) {
+              size_t buy_id =
+              static_cast<size_t>(stockList[stockID].buyingOrders.top().trader_id);
+              
+              size_t sell_id =
+              static_cast<size_t>(stockList[stockID].sellingOrders.top().trader_id);
+
+              traderList[buy_id].purchase +=
+              stockList[stockID].buyingOrders.top().quantity;
+              
+              traderList[sell_id].sale +=
+              stockList[stockID].buyingOrders.top().quantity;
+              
+              traderList[sell_id].net +=
+              stockList[stockID].buyingOrders.top().quantity * 
+              stockList[stockID].buyingOrders.top().price;
+
+              traderList[buy_id].net -=
+              stockList[stockID].buyingOrders.top().quantity * 
+              stockList[stockID].buyingOrders.top().price;
+            } // if ... trader_info
 
           } // else ... buyingOrder came first
 

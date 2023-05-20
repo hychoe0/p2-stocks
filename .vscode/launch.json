@@ -13,7 +13,7 @@
                 null // redirect stderr
             ],
             "args": [
-                "-m"
+                "-i"
             ],
             "stopOnEntry": false,
             "cwd": "${workspaceFolder}",

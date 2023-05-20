@@ -48,15 +48,19 @@ struct SellComparator {
     }
 };
 
-class Stocks {
-public:
-
+struct Stocks {
   // need two priority queue for buying and selling stock
   priority_queue<Orders, vector<Orders>, BuyComparator> buyingOrders;
   priority_queue<Orders, vector<Orders>, SellComparator> sellingOrders;
 
   // vector to store successful order prices
   vector<int> matchOrders;
+};
+
+struct Trader {
+  int purchase = 0;
+  int sale = 0;
+  int net = 0;
 };
 
 class Market {
@@ -106,6 +110,7 @@ public:
 
   vector<Orders> timeTraveler;
   vector<Stocks> stockList;
+  vector<Trader> traderList;
 
   int total_trade;
 
