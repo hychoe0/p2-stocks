@@ -12,7 +12,9 @@
                 null, // redirect stdout
                 null // redirect stderr
             ],
-            "args": [],
+            "args": [
+                "-m"
+            ],
             "stopOnEntry": false,
             "cwd": "${workspaceFolder}",
             "postDebugTask": "clean workspace"

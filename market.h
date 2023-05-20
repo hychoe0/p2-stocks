@@ -8,6 +8,7 @@
 // #include <vector>
 #include <queue>
 #include <getopt.h>
+#include <algorithm>
 #include "P2random.h"
 
 using namespace std;
@@ -54,7 +55,8 @@ public:
   priority_queue<Orders, vector<Orders>, BuyComparator> buyingOrders;
   priority_queue<Orders, vector<Orders>, SellComparator> sellingOrders;
 
-  
+  // vector to store successful order prices
+  vector<int> matchOrders;
 };
 
 class Market {
@@ -84,6 +86,8 @@ public:
 
   void printResult();
 
+  int calculateMedian(vector<int> &orders);
+
 
   // MOVE TO PRIVATE AFTER TEST
   int num_traders;
@@ -104,6 +108,8 @@ public:
   vector<Stocks> stockList;
 
   int total_trade;
+
+  int median_timestamp;
 
 private:
 

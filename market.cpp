@@ -146,10 +146,16 @@ void Market::getOrders() {
         exit(1);
       }
 
-      // This means the timestamp of the order changed
+      // This means the timestamp of the order changed, time for median
       if (curr_timestamp != order.timestamp && median) {
-        for (int stockID = 0; stockID < num_stocks; ++stockID) {
-          // calculateMedian(stockList[stockID].matchOrders);
+        for (size_t stockID = 0;
+             stockID < static_cast<size_t>(num_stocks);
+             ++stockID) {
+          int medianValue = calculateMedian(stockList[stockID].matchOrders);
+          if (medianValue >= 0) {
+            cout << "Median match price of Stock " << stockID << " at time "
+                 << curr_timestamp << " is $" << medianValue << "\n";
+          }
         }
       }
       // decreasing timestamp
@@ -159,6 +165,9 @@ void Market::getOrders() {
       trade();
       } // while ... cin each order
 
+      if (median) {
+        median_timestamp = order.timestamp;
+      }
   } // if ... TL mode
 
   else if (mode == "PR") {
@@ -180,6 +189,19 @@ void Market::getOrders() {
 
   } // else if ... PR mode
 
+  // The very last timestamp median value
+  if (median) {
+    for (size_t stockID = 0;
+         stockID < static_cast<size_t>(num_stocks);
+         ++stockID) {
+      int medianValue = calculateMedian(stockList[stockID].matchOrders);
+      if (medianValue >= 0) {
+        cout << "Median match price of Stock " << stockID << " at time "
+              << median_timestamp << " is $" << medianValue << "\n";
+      }
+    }
+  } // if ... very last median
+
   // End of Day...
   printResult();
 
@@ -195,7 +217,7 @@ void Market::processOrders(istream &inputStream) {
   string junk;
   char chunk;
   int count = 0;
-  // int curr_timestamp = 0;
+  int curr_timestamp = 0;
 
   // Read orders from inputStream, NOT cin
   while (inputStream >> order.timestamp >> order.intent >> junk >> chunk
@@ -232,10 +254,30 @@ void Market::processOrders(istream &inputStream) {
       exit(1);
     }
 
+    // This means the timestamp of the order changed, time for median
+    if (curr_timestamp != order.timestamp && median) {
+      for (size_t stockID = 0;
+           stockID < static_cast<size_t>(num_stocks);
+           ++stockID) {
+        int medianValue = calculateMedian(stockList[stockID].matchOrders);
+        if (medianValue >= 0) {
+          cout << "Median match price of Stock " << stockID << " at time "
+                << curr_timestamp << " is $" << medianValue << "\n";
+        }
+      }
+    }
+    // decreasing timestamp
+    curr_timestamp = order.timestamp; 
+
     // TODO: processing time traveler mode and median mode
     trade();
 
   }  // while ..inputStream
+  
+  if (median) {
+    median_timestamp = order.timestamp;
+  }
+
 } // processOrders()
 
 void Market::trade() {
@@ -417,6 +459,10 @@ void Market::printResult() {
 }
 
 int Market::calculateMedian(vector<int> &orders) {
+  if (orders.empty()) {
+    return -1;
+  }
+
   sort(orders.begin(), orders.end()); // Sort in ascending Order
 
   if (orders.size() % 2 == 0) {
@@ -424,7 +470,7 @@ int Market::calculateMedian(vector<int> &orders) {
     int middle2 = orders[orders.size() / 2];
     return (middle1 + middle2) / 2;
   } // if ... order is EVEN
-  
+
   else {
     return orders[orders.size() / 2];
   } // else ... order is ODD
