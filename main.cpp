@@ -16,6 +16,36 @@ int main(int argc, char** argv) {
   
   market.getOrders();
 
+  // //TEST
+
+  // std::priority_queue<int> small;
+  // std::priority_queue<int, std::vector<int>, std::greater<int>> large;
+  // // Add some sample values to the priority queues
+  // small.push(10);
+  // small.push(30);
+  // small.push(50);
+  // large.push(20);
+  // large.push(40);
+  // large.push(60);
+
+  // // Call the sortMedianPQ function
+  // market.sortMedianPQ(small, large);
+
+  // // Output the sorted priority queues
+  // cout << "Small PQ: ";
+  // while (!small.empty()) {
+  //     cout << small.top() << " ";
+  //     small.pop();
+  // }
+  // cout << endl;
+
+  // cout << "Large PQ: ";
+  // while (!large.empty()) {
+  //     cout << large.top() << " ";
+  //     large.pop();
+  // }
+  // cout << endl;
+
   
 
   // // TEST

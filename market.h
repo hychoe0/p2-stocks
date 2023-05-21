@@ -53,8 +53,9 @@ struct Stocks {
   priority_queue<Orders, vector<Orders>, BuyComparator> buyingOrders;
   priority_queue<Orders, vector<Orders>, SellComparator> sellingOrders;
 
-  // vector to store successful order prices
-  vector<int> matchOrders;
+  // two priority queues for median
+  priority_queue<int> small;
+  priority_queue<int, vector<int>, greater<int>> large;
 };
 
 struct Trader {
@@ -90,7 +91,11 @@ public:
 
   void printResult();
 
-  int calculateMedian(vector<int> &orders);
+  void sortMedianPQ(priority_queue<int> &small,
+                   priority_queue<int, vector<int>, greater<int>> &large);
+
+  int calculateMedian(priority_queue<int> small,
+                      priority_queue<int, vector<int>, greater<int>> large);
 
 
   // MOVE TO PRIVATE AFTER TEST

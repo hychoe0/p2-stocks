@@ -153,8 +153,9 @@ void Market::getOrders() {
         for (size_t stockID = 0;
              stockID < static_cast<size_t>(num_stocks);
              ++stockID) {
-          int medianValue = calculateMedian(stockList[stockID].matchOrders);
-          if (medianValue >= 0) {
+          int medianValue = calculateMedian(stockList[stockID].small,
+                                            stockList[stockID].large);
+          if (medianValue > 0) {
             cout << "Median match price of Stock " << stockID << " at time "
                  << curr_timestamp << " is $" << medianValue << "\n";
           }
@@ -196,8 +197,9 @@ void Market::getOrders() {
     for (size_t stockID = 0;
          stockID < static_cast<size_t>(num_stocks);
          ++stockID) {
-      int medianValue = calculateMedian(stockList[stockID].matchOrders);
-      if (medianValue >= 0) {
+      int medianValue = calculateMedian(stockList[stockID].small,
+                                        stockList[stockID].large);
+      if (medianValue > 0) {
         cout << "Median match price of Stock " << stockID << " at time "
               << median_timestamp << " is $" << medianValue << "\n";
       }
@@ -266,8 +268,9 @@ void Market::processOrders(istream &inputStream) {
       for (size_t stockID = 0;
            stockID < static_cast<size_t>(num_stocks);
            ++stockID) {
-        int medianValue = calculateMedian(stockList[stockID].matchOrders);
-        if (medianValue >= 0) {
+        int medianValue = calculateMedian(stockList[stockID].small,
+                                          stockList[stockID].large);
+        if (medianValue > 0) {
           cout << "Median match price of Stock " << stockID << " at time "
                 << curr_timestamp << " is $" << medianValue << "\n";
         }
@@ -294,8 +297,6 @@ void Market::trade() {
 
     while (!stockList[stockID].buyingOrders.empty() &&
            !stockList[stockID].sellingOrders.empty()) {
-      // Orders topBuyOrder = stockList[stockID].buyingOrders.top();
-      // Orders topSellOrder = stockList[stockID].sellingOrders.top();
 
       // if selling price is higher than buying price, trade doesn't work
       if (stockList[stockID].buyingOrders.top().price <
@@ -322,8 +323,16 @@ void Market::trade() {
             } // if ... verbose
 
             if (median) {
-              stockList[stockID].matchOrders.push_back
-              (stockList[stockID].sellingOrders.top().price);
+              int soldPrice = stockList[stockID].sellingOrders.top().price;
+              if (stockList[stockID].small.empty()) {
+                stockList[stockID].small.push(soldPrice);
+              }
+              else if (soldPrice < stockList[stockID].small.top()) {
+                stockList[stockID].small.push(soldPrice);
+              }
+              else {
+                stockList[stockID].large.push(soldPrice);
+              }
             } // if .. median
 
             if (trader_info) {
@@ -360,8 +369,16 @@ void Market::trade() {
             } // if ... verbose
 
             if (median) {
-              stockList[stockID].matchOrders.push_back
-              (stockList[stockID].buyingOrders.top().price);
+              int soldPrice = stockList[stockID].buyingOrders.top().price;
+              if (stockList[stockID].small.empty()) {
+                stockList[stockID].small.push(soldPrice);
+              }
+              else if (soldPrice < stockList[stockID].small.top()) {
+                stockList[stockID].small.push(soldPrice);
+              }
+              else {
+                stockList[stockID].large.push(soldPrice);
+              }
             } // if .. median
 
             if (trader_info) {
@@ -417,8 +434,16 @@ void Market::trade() {
             } // if ... verbose
 
             if (median) {
-              stockList[stockID].matchOrders.push_back
-              (stockList[stockID].sellingOrders.top().price);
+              int soldPrice = stockList[stockID].sellingOrders.top().price;
+              if (stockList[stockID].small.empty()) {
+                stockList[stockID].small.push(soldPrice);
+              }
+              else if (soldPrice < stockList[stockID].small.top()) {
+                stockList[stockID].small.push(soldPrice);
+              }
+              else {
+                stockList[stockID].large.push(soldPrice);
+              }
             } // if .. median
 
             if (trader_info) {
@@ -454,8 +479,16 @@ void Market::trade() {
             } // if ... verbose
 
             if (median) {
-              stockList[stockID].matchOrders.push_back
-              (stockList[stockID].buyingOrders.top().price);
+              int soldPrice = stockList[stockID].buyingOrders.top().price;
+              if (stockList[stockID].small.empty()) {
+                stockList[stockID].small.push(soldPrice);
+              }
+              else if (soldPrice < stockList[stockID].small.top()) {
+                stockList[stockID].small.push(soldPrice);
+              }
+              else {
+                stockList[stockID].large.push(soldPrice);
+              }
             } // if .. median
 
             if (trader_info) {
@@ -506,8 +539,16 @@ void Market::trade() {
             } // if ... verbose
 
             if (median) {
-              stockList[stockID].matchOrders.push_back
-              (stockList[stockID].sellingOrders.top().price);
+              int soldPrice = stockList[stockID].sellingOrders.top().price;
+              if (stockList[stockID].small.empty()) {
+                stockList[stockID].small.push(soldPrice);
+              }
+              else if (soldPrice < stockList[stockID].small.top()) {
+                stockList[stockID].small.push(soldPrice);
+              }
+              else {
+                stockList[stockID].large.push(soldPrice);
+              }
             } // if .. median
 
             if (trader_info) {
@@ -543,8 +584,16 @@ void Market::trade() {
             } // if ... verbose
 
             if (median) {
-              stockList[stockID].matchOrders.push_back
-              (stockList[stockID].buyingOrders.top().price);
+              int soldPrice = stockList[stockID].buyingOrders.top().price;
+              if (stockList[stockID].small.empty()) {
+                stockList[stockID].small.push(soldPrice);
+              }
+              else if (soldPrice < stockList[stockID].small.top()) {
+                stockList[stockID].small.push(soldPrice);
+              }
+              else {
+                stockList[stockID].large.push(soldPrice);
+              }
             } // if .. median
 
             if (trader_info) {
@@ -578,6 +627,11 @@ void Market::trade() {
 
         } // else ... buyingOrder.quantity == sellingOrder.quantity
 
+        // Sort the median queue after every successful trade
+        if (median) {
+          sortMedianPQ(stockList[stockID].small, stockList[stockID].large);
+        }
+
       } // else ... when successful trade happens
               
     } // while ... stockList[stockID].buy and sell.empty()
@@ -597,21 +651,34 @@ void Market::printResult() {
   cout << "---End of Day---\n" << "Trades Completed: " << total_trade << "\n";
 }
 
-int Market::calculateMedian(vector<int> &orders) {
-  if (orders.empty()) {
-    return -1;
+void Market::sortMedianPQ(priority_queue<int>
+                          &small,
+                          priority_queue<int, vector<int>, greater<int>>
+                          &large) {
+  if (large.size() - small.size() == 2) {
+      small.push(large.top());
+      large.pop();
   }
+  else if ((small.size() - large.size() == 2)) {
+      large.push(small.top());
+      small.pop();
+  }
+}
 
-  sort(orders.begin(), orders.end()); // Sort in ascending Order
-
-  if (orders.size() % 2 == 0) {
-    int middle1 = orders[(orders.size() / 2) - 1];
-    int middle2 = orders[orders.size() / 2];
-    return (middle1 + middle2) / 2;
-  } // if ... order is EVEN
-
+int Market::calculateMedian(priority_queue<int>
+                             small,
+                             priority_queue<int, vector<int>, greater<int>>
+                             large) {
+  if (small.empty() && large.empty()) {
+    return 0;
+  }
+  else if (small.size() > large.size()) {
+    return small.top();
+  }                    
+  else if (large.size() > small.size()) {
+    return large.top();
+  }
   else {
-    return orders[orders.size() / 2];
-  } // else ... order is ODD
-
+    return (small.top() + large.top()) / 2;
+  } // else ... small.size() == large.size(), even number
 }
