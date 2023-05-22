@@ -8,12 +8,12 @@
             "preLaunchTask": "build debug executable",
             "program": "${workspaceFolder}/market_debug",
             "stdio": [
-                "spec-input-TL.txt", // redirect stdin
+                "perf-test.txt", // redirect stdin
                 null, // redirect stdout
                 null // redirect stderr
             ],
             "args": [
-                "-m"
+                "-t"
             ],
             "stopOnEntry": false,
             "cwd": "${workspaceFolder}",

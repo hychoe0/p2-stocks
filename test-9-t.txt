@@ -1,0 +1,9 @@
+COMMENT: time traveler infinite loop
+MODE: TL
+NUM_TRADERS: 3
+NUM_STOCKS: 2
+2 SELL T2 S1 $86 #23
+2 SELL T0 S0 $20 #39
+2 BUY T1 S1 $100 #24
+2 SELL T1 S1 $83 #45
+3 SELL T2 S1 $6 #19

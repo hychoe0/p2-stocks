@@ -56,6 +56,10 @@ struct Stocks {
   // two priority queues for median
   priority_queue<int> small;
   priority_queue<int, vector<int>, greater<int>> large;
+
+  // priority queues for time travelers
+  priority_queue<Orders, vector<Orders>, SellComparator> t_buyingOrders;
+  priority_queue<Orders, vector<Orders>, BuyComparator> t_sellingOrders;
 };
 
 struct Trader {
@@ -97,6 +101,8 @@ public:
   int calculateMedian(priority_queue<int> small,
                       priority_queue<int, vector<int>, greater<int>> large);
 
+  void calculateTimeTravel();
+
 
   // MOVE TO PRIVATE AFTER TEST
   int num_traders;
@@ -113,7 +119,6 @@ public:
 
   bool time_travelers = false;
 
-  vector<Orders> timeTraveler;
   vector<Stocks> stockList;
   vector<Trader> traderList;
 
