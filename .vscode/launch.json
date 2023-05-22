@@ -8,7 +8,7 @@
             "preLaunchTask": "build debug executable",
             "program": "${workspaceFolder}/market_debug",
             "stdio": [
-                "perf-test.txt", // redirect stdin
+                "test-0-v.txt", // redirect stdin
                 null, // redirect stdout
                 null // redirect stderr
             ],

@@ -675,68 +675,6 @@ void Market::trade() {
   } // for ... stockID < num_stocks
 } // trade()
 
-// void Market::calculateTimeTravel() {
-//   size_t s_num_stocks = static_cast<size_t>(num_stocks);
-  
-//   cout << "---Time Travelers---\n";
-
-//   // need 3 variables current buy and sold, potential buy and buy time
-//   for (size_t stockID = 0; stockID < s_num_stocks; ++stockID) {
-    
-//     priority_queue<Orders, vector<Orders>, SellComparator> tempBuy = 
-//     stockList[stockID].t_buyingOrders;
-//     priority_queue<Orders, vector<Orders>, BuyComparator> tempSell = 
-//     stockList[stockID].t_sellingOrders;
-
-//     bool foundMatch = false;
-//     int highestProfit = 0;
-//     int highestBuyTime = 0;
-//     int highestBuyPrice = 0;
-//     int highestSellTime = 0;
-//     int highestSellPrice = 0;
-//     // // TEST
-//     // cout << "tempBuy.top().price: " << tempBuy.top().price << endl;    
-//     // cout << "tempSell.top().price: " << tempSell.top().price << endl;    
-    
-//     for (size_t i = 0; i < stockList[stockID].t_sellingOrders.size(); ++i) {
-//       for (size_t j = 0; j < stockList[stockID].t_buyingOrders.size(); ++j) {
-//         if (tempBuy.top().price < tempSell.top().price && 
-//             tempBuy.top().placement < tempSell.top().placement &&
-//             tempSell.top().price - tempBuy.top().price > highestProfit) {
-//           foundMatch = true;
-//           highestProfit = tempSell.top().price - tempBuy.top().price;
-//           highestBuyTime = tempBuy.top().timestamp;
-//           highestBuyPrice = tempBuy.top().price;
-//           highestSellTime = tempSell.top().timestamp;
-//           highestSellPrice = tempSell.top().price;
-//           // cout << "A time traveler would buy Stock " << stockID
-//           //      << " at time " << tempBuy.top().timestamp
-//           //      << " for $" << tempBuy.top().price
-//           //      << " and sell it at time " << tempSell.top().timestamp
-//           //      << " for $" << tempSell.top().price << "\n";
-//         } 
-//         else {
-//           tempBuy.pop();
-//         }
-//       } // for ... tempBuy.size()
-//       tempSell.pop();
-//       tempBuy = stockList[stockID].t_buyingOrders;
-//     } // for ... tempSell.size()
-    
-//     if (!foundMatch) {
-//       cout << "A time traveler could not make a profit on Stock " << stockID
-//            << "\n";
-//     }
-//     else {
-//       cout << "A time traveler would buy Stock " << stockID
-//            << " at time " << highestBuyTime
-//            << " for $" << highestBuyPrice
-//            << " and sell it at time " << highestSellTime
-//            << " for $" << highestSellPrice << "\n";
-//     } // else ... foundMatch
-//   } // for ... stockID < num_stocks
-// }
-
 void Market::calculateTimeTravel() {
   size_t s_num_stocks = static_cast<size_t>(num_stocks);
 
@@ -753,45 +691,50 @@ void Market::calculateTimeTravel() {
     int highestSellTime = 0;
     int highestSellPrice = 0;
 
-    while (!sellingOrders.empty()) {
-      const Orders& currentSell = sellingOrders.top();
-      const Orders& currentBuy = buyingOrders.top();
-
-      if (currentBuy.price < currentSell.price && currentBuy.placement < currentSell.placement) {
-        int currentProfit = currentSell.price - currentBuy.price;
-        if (currentProfit > highestProfit) {
-          foundMatch = true;
-          highestProfit = currentProfit;
-          highestBuyTime = currentBuy.timestamp;
-          highestBuyPrice = currentBuy.price;
-          highestSellTime = currentSell.timestamp;
-          highestSellPrice = currentSell.price;
-        }
-        sellingOrders.pop();
-        buyingOrders = stockList[stockID].t_buyingOrders;
-      }
-      else {
-        buyingOrders.pop();
-        if (buyingOrders.empty()) {
-          sellingOrders.pop();
-          if (buyingOrders.empty() && sellingOrders.empty()) {
-            break;  // Exit the loop if both buyingOrders and sellingOrders are empty
-          }
-          buyingOrders = stockList[stockID].t_buyingOrders;
-        }
-      }
-    } // while ... !sellingOrder.empty()
-
-    if (!foundMatch) {
+    if (sellingOrders.empty() || buyingOrders.empty()) {
       cout << "A time traveler could not make a profit on Stock " << stockID << "\n";
     }
     else {
-      cout << "A time traveler would buy Stock " << stockID
-           << " at time " << highestBuyTime
-           << " for $" << highestBuyPrice
-           << " and sell it at time " << highestSellTime
-           << " for $" << highestSellPrice << "\n";
-    }
+      while (!sellingOrders.empty()) {
+        const Orders& currentSell = sellingOrders.top();
+        const Orders& currentBuy = buyingOrders.top();
+
+        if (currentBuy.price < currentSell.price && currentBuy.placement < currentSell.placement) {
+          int currentProfit = currentSell.price - currentBuy.price;
+          if (currentProfit > highestProfit) {
+            foundMatch = true;
+            highestProfit = currentProfit;
+            highestBuyTime = currentBuy.timestamp;
+            highestBuyPrice = currentBuy.price;
+            highestSellTime = currentSell.timestamp;
+            highestSellPrice = currentSell.price;
+          }
+          sellingOrders.pop();
+          buyingOrders = stockList[stockID].t_buyingOrders;
+        }
+        else {
+          buyingOrders.pop();
+          if (buyingOrders.empty()) {
+            sellingOrders.pop();
+            if (buyingOrders.empty() && sellingOrders.empty()) {
+              break;  // Exit the loop if both buyingOrders and sellingOrders are empty
+            }
+            buyingOrders = stockList[stockID].t_buyingOrders;
+          }
+        }
+      } // while ... !sellingOrder.empty()
+
+      if (!foundMatch) {
+        cout << "A time traveler could not make a profit on Stock " << stockID << "\n";
+      }
+      else {
+        cout << "A time traveler would buy Stock " << stockID
+            << " at time " << highestBuyTime
+            << " for $" << highestBuyPrice
+            << " and sell it at time " << highestSellTime
+            << " for $" << highestSellPrice << "\n";
+      }
+    } // if .. successful
   }
 }
 
